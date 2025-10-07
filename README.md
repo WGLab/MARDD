@@ -25,14 +25,14 @@ This project solves these problems in two stages:
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/face-enhancement-pipeline.git
+git clone https://github.com/WGLab/Rare-Disease-Diagnosis-Image-Preprocessing.git
 cd face-enhancement-pipeline
 ```
 
 ### 2. Create and activate a virtual environment
 ```bash
-python -m venv venv
-source venv/bin/activate   # On Windows: venv\Scripts\activate
+conda create -n face-enhancement
+conda activate face-enhancement   
 ```
 
 ### 3. Install dependencies
@@ -40,28 +40,16 @@ source venv/bin/activate   # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-Your `requirements.txt` should include:
-```
-gfpgan
-rembg
-opencv-python
-numpy
-```
-
-*(Optional: you may need `torch` and `torchvision` if not installed automatically by GFPGAN)*
-
----
-
 ## 🚀 Usage
 
 ### 1. Restore Faces with GFPGAN
 ```bash
-python restore_faces.py --input input_images/ --output restored_faces/
+
 ```
 
 ### 2. Remove/Unify Backgrounds with Rembg
 ```bash
-python unify_background.py --input restored_faces/ --output final_images/
+
 ```
 
 ---
@@ -80,16 +68,6 @@ python unify_background.py --input restored_faces/ --output final_images/
 
 ---
 
-## 🪄 Customization
-
-- You can modify the background after removal using tools like **Pillow** or **OpenCV**.
-- If you want a solid background instead of transparency:
-  ```bash
-  rembg i --background white input.png output.png
-  ```
-
----
-
 ## 📁 Project Structure
 
 ```
@@ -105,16 +83,6 @@ face-enhancement-pipeline/
 ├── requirements.txt
 └── README.md
 ```
-
----
-
-## 💡 Notes
-
-- GFPGAN can be GPU-accelerated if CUDA is available.
-- For batch processing, both scripts can be easily adapted to handle multiple images.
-- You can integrate the pipeline into web apps or data preprocessing workflows.
-
----
 
 ## 🧾 License
 
