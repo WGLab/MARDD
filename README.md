@@ -83,7 +83,7 @@ Key stats for the **ten-disease subset**:
 > You must obtain data access following your **institutional, IRB, and data-use agreements**, then place the files under `data/raw/`.
 
 <p align="center">
-  <img src="docs/figures/data_distribution.png" alt="Label distribution and cohort statistics for the GMDB ten-disease subset" width="800">
+  <img src="docs/figures/data_distribution.svg" alt="Label distribution and cohort statistics for the GMDB ten-disease subset" width="800">
 </p>
 
 ---
