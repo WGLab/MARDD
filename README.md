@@ -1,15 +1,15 @@
 # GestaltM³D-VL: Multimodal Vision–Language Diagnosis of Mendelian Rare Diseases
 
 > **GestaltM³D-VL** (Gestalt Multimodal Model for Mendelian Disease Diagnosis with Vision–Language Integration)  
-> A multimodal model leveraging **facial images** and **HPO-encoded clinical text** for **Mendelian rare disease diagnosis**.  
-> We additionally train **StyleGAN3** on GMDB faces to generate **synthetic facial images** used for **evaluation and analysis**, **not** for privacy attacks.
+> A **diagnosis-first** multimodal model that leverages **facial images** and **HPO-encoded clinical text** for **Mendelian rare disease diagnosis**.  
+> Additionally, we train **StyleGAN3** on GMDB faces to generate **synthetic facial images** used for **qualitative evaluation and analysis**.
 
 ---
 
-### Overall pipeline
+### Overall pipeline (Diagnosis-centric)
 
 <p align="center">
-  <img src="docs/figures/overview_pipeline.png" alt="Overall pipeline of GestaltM3D-VL" width="800">
+  <img src="docs/figures/overview_pipeline.png" alt="Overall diagnosis-centric pipeline of GestaltM3D-VL" width="800">
 </p>
 
 ### Example faces & HPO text
@@ -25,8 +25,8 @@
 1. [Project Overview](#1-project-overview)
 2. [Dataset: GMDB Ten-Disease Subset](#2-dataset-gmdb-ten-disease-subset)
 3. [Data Preprocessing Pipeline](#3-data-preprocessing-pipeline)
-4. [Part I – StyleGAN3 Synthesis for Evaluation](#4-part-i--stylegan3-synthesis-for-evaluation)
-5. [Part II – GestaltM³D-VL for Multimodal Diagnosis](#5-part-ii--gestaltm³d-vl-for-multimodal-diagnosis)
+4. [Part I – GestaltM³D-VL for Multimodal Diagnosis](#4-part-i--gestaltm³d-vl-for-multimodal-diagnosis)
+5. [Part II – StyleGAN3 Synthesis for Evaluation](#5-part-ii--stylegan3-synthesis-for-evaluation)
 6. [Repository Structure](#6-repository-structure)
 7. [Installation](#7-installation)
 8. [Data Preparation](#8-data-preparation)
@@ -39,29 +39,24 @@
 
 ## 1. Project Overview
 
-This repository implements a pipeline for **Mendelian rare disease diagnosis** on the **GMDB ten-disease subset** (and optionally CHOP cohorts):
+This repository implements a **disease-diagnosis–centric** pipeline on the **GMDB ten-disease subset** (and optionally CHOP cohorts):
 
-1. **Part I – StyleGAN3-based Image Synthesis for Evaluation**
-   - Train **class-conditional StyleGAN3** on:
-     - GMDB ten-disease facial images
-     - (Optionally) a larger unaffected cohort
-   - Generate **synthetic facial images** for:
-     - Visual inspection of disease-specific facial gestalt
-     - Stylized comparison between real and model-predicted cases
-     - Additional **evaluation scenarios** (e.g., robustness tests, case studies)
+1. **Part I – GestaltM³D-VL (Main Contribution: Multimodal Diagnosis)**
+   - A **vision–language model** based on **Qwen-VL** that ingests:
+     - Preprocessed **facial images**.
+     - **HPO-encoded clinical text** (with or without demographics).
+   - Outputs **Mendelian rare disease labels** under a **long-tailed** label space.
+   - Uses **Class-Balanced Focal Loss** to focus on **rare diseases**.
 
-2. **Part II – GestaltM³D-VL (Vision–Language Multimodal Diagnosis)**
-   - Adapt **Qwen-2-VL / Qwen-2.5-VL / Qwen-3-VL** into a **multimodal classifier**.
-   - Inputs:
-     - **Facial image** (preprocessed 224×224 front-view face).
-     - **Clinical text**: HPO-encoded phenotypes (+/- demographics).
-   - Output:
-     - **Disease label** among rare Mendelian syndromes.
-   - Loss:
-     - **Class-Balanced Focal Loss** to handle long-tail label distribution.
+2. **Part II – StyleGAN3-based Synthesis (Support: Evaluation & Visualization)**
+   - Train **class-conditional StyleGAN3** on GMDB faces.
+   - Generate **synthetic facial images**:
+     - For **qualitative evaluation** of disease-specific gestalt.
+     - For **visual case studies** comparing predicted diseases and synthetic exemplars.
+   - StyleGAN3 is **auxiliary**; the **primary focus** is the diagnosis model.
 
 <p align="center">
-  <img src="docs/figures/method_block_diagram.png" alt="High-level block diagram of the full method" width="800">
+  <img src="docs/figures/method_block_diagram.png" alt="High-level block diagram of the diagnosis-centric method" width="800">
 </p>
 
 ---
@@ -101,7 +96,7 @@ Original facial images in GMDB/CHOP often suffer from:
 - Grayscale or washed-out colors
 - Cluttered backgrounds
 
-We build a **three-stage preprocessing pipeline**:
+We build a **three-stage preprocessing pipeline** shared by both the diagnosis model and StyleGAN3:
 
 1. **Color Restoration – DDColor**
    - Colorize grayscale / washed-out facial images.
@@ -122,79 +117,12 @@ The script `src/data/preprocess_faces.py` orchestrates DDColor, GFPGAN, and Medi
 
 ---
 
-## 4. Part I – StyleGAN3 Synthesis for Evaluation
+## 4. Part I – GestaltM³D-VL for Multimodal Diagnosis
 
-### 4.1 Goal
+> ✅ **This is the main part of the project.**  
+> All other components (e.g., StyleGAN3) are designed to support or analyze this diagnosis model.
 
-We use **StyleGAN3** as a **class-conditional face generator** trained on GMDB ten-disease faces.  
-In this project, synthetic images are used for:
-
-- **Qualitative evaluation** of disease-specific facial patterns.
-- **Case studies** comparing:
-  - real patient images, and
-  - synthetic faces conditioned on the predicted disease.
-- Potential **data augmentation / stress tests**, if desired.
-
-We **do not** implement or focus on privacy attacks in this repository.
-
-### 4.2 StyleGAN3 Overview
-
-- Alias-free generation with improved geometric consistency.
-- Reduced texture “sticking” compared to StyleGAN2.
-- Separate **mapping network** and **synthesis network**, with class conditioning.
-
-Training data:
-
-- **Ten-disease cohort**: 1,847 patients.
-- (Optional) **unaffected/healthy cohort** to balance age/ethnicity.
-
-<p align="center">
-  <img src="docs/figures/stylegan3_overview.png" alt="StyleGAN3 architecture and training overview" width="800">
-</p>
-
-### 4.3 Training & Sampling
-
-Configuration sketch (see `configs/stylegan3/ten_disease_default.yaml`):
-
-- Conditional labels: { ten-disease classes (+ optional unaffected class) }
-- Training iterations: e.g., **25,000 kimg**
-- Augmentations: StyleGAN3 default configuration
-
-Run:
-
-```bash
-bash scripts/train_stylegan3.sh
-bash scripts/sample_stylegan3.sh
-```
-
-This will:
-
-1. Train StyleGAN3 on preprocessed GMDB faces.
-2. Save synthetic samples for each disease class under `data/processed/stylegan3_samples/` (or a path you configure).
-
-### 4.4 Using Synthetic Images for Evaluation
-
-Synthetic images from StyleGAN3 can support analysis such as:
-
-- Visual comparison between:
-  - Real patient (input image)
-  - Disease predicted by GestaltM³D-VL
-  - Synthetic images conditioned on the same disease label
-- Qualitative assessment of:
-  - Model’s disease confusion patterns
-  - Intra-class variability captured by StyleGAN3
-
-You can load synthetic images as a small “gallery” in notebooks under `notebooks/` for interactive exploration.
-
-<p align="center">
-  <img src="docs/figures/stylegan3_synthetic_examples.png" alt="Synthetic samples per disease class generated by StyleGAN3" width="800">
-</p>
-
----
-
-## 5. Part II – GestaltM³D-VL for Multimodal Diagnosis
-
-### 5.1 Motivation
+### 4.1 Motivation
 
 We target **Mendelian rare disease diagnosis** from:
 
@@ -203,13 +131,13 @@ We target **Mendelian rare disease diagnosis** from:
 
 Challenges:
 
-- GMDB is **long-tailed** (many rare diseases with few examples).
+- GMDB is **highly long-tailed** (many rare diseases with few examples).
 - Data is **noisy** (missing HPO terms, variable image quality).
-- Naive cross-entropy tends to overfit **head classes**.
+- Standard cross-entropy tends to overfit **head classes** and underperform on rare diseases.
 
-### 5.2 Backbone: Qwen-VL Family
+### 4.2 Backbone: Qwen-VL Family
 
-We build on **Qwen-VL** models:
+GestaltM³D-VL is built on **Qwen-VL** models:
 
 - **Qwen-2-VL-7B-Instruct**
 - **Qwen-2.5-VL-7B-Instruct** (default backbone)
@@ -219,68 +147,142 @@ Advantages:
 
 - Strong **vision–language alignment**.
 - Good **parameter–compute trade-off** (7–8B).
-- Handles **long clinical prompts** and **noisy faces**.
+- Handles **long, noisy clinical text**.
 
-### 5.3 Model Architecture (Sequence Classification)
+### 4.3 Model Architecture (Sequence Classification)
 
-GestaltM³D-VL adapts Qwen-VL into **multimodal sequence classification**:
+We adapt Qwen-VL into a **multimodal sequence classifier**:
 
 1. **Inputs**:
-   - `image`: 224×224 preprocessed face.
+   - `image`: 224×224 preprocessed facial image.
    - `text`:
-     - HPO-encoded phenotypes.
-     - Optionally demographics (we often **drop** demographics to reduce bias and privacy concerns).
+     - HPO-encoded phenotypes (primary signal).
+     - Optional demographics (often **dropped** to reduce bias).
 
 2. **Multimodal encoding**:
-   - Construct an instruction-style prompt containing the HPO terms.
+   - Construct an instruction-style prompt that embeds HPO terms into natural language.
    - Feed image + text into Qwen-VL.
-   - Take the hidden state at a special **`[CLS]`** (or equivalent pooling token).
+   - Obtain the hidden state at a special **`[CLS]` token** (or equivalent pooled representation).
 
 3. **Classifier head**:
-   - Apply a **Linear(D → #classes)** layer on the `[CLS]` representation.
+   - Apply a small **MLP/Linear(D → #classes)** head to predict disease logits.
 
 4. **Loss**:
-   - Use **Class-Balanced Focal Loss** to mitigate label imbalance.
-
-Training strategy (example):
-
-- Freeze most of the **text backbone**.
-- Optionally partially freeze the **vision backbone**.
-- Train:
-  - Multimodal projector
-  - Top transformer blocks (via LoRA)
-  - Final classifier head
+   - Use **Class-Balanced Focal Loss** to handle severe imbalance.
 
 <p align="center">
   <img src="docs/figures/mm_llm_architecture.png" alt="GestaltM3D-VL multimodal sequence classification architecture" width="800">
 </p>
 
-### 5.4 Loss: Class-Balanced Focal Loss
+### 4.4 Loss: Class-Balanced Focal Loss
 
-Let \( n_y \) be the sample count for class \( y \).  
-Compute class weights \( \alpha_y \) based on effective number of samples (e.g., Cui et al., CVPR 2019).  
-Use focal loss with focusing parameter \( \gamma > 0 \):
+Let \( n_y \) be the number of samples of class \( y \).  
+We compute effective class weights \( \alpha_y \) based on the **effective number of samples** (e.g., Cui et al., CVPR 2019) and adopt **focal loss** with focusing parameter \( \gamma \):
 
-- Addresses severe **class imbalance**.
-- Focuses training on **hard** and **rare** classes.
+- Increases the importance of **rare diseases**.
+- Focuses training on **hard examples** instead of easy head-class samples.
 
-Implementation details in:
+Implementation:
 
 - `src/models/mm_llm/losses.py`
 
-### 5.5 Observations (from internal experiments)
+### 4.5 Training Strategy
 
-- **Multimodal (image + text) > Image-only**.
-- Removing demographics from the prompt:
-  - Maintains or improves performance.
-  - Reduces reliance on explicit ethnicity/age/sex.
-- Upgrading backbone from Qwen-2-VL to **Qwen-2.5-VL** improves overall performance.
+Typical strategy:
+
+- Freeze a large portion of the **text backbone**.
+- Optionally partially freeze the **vision backbone**.
+- Train:
+  - Multimodal projector layers.
+  - Top transformer blocks (via LoRA or full finetuning).
+  - Final classifier head.
+
+Training entry point:
+
+- `src/models/mm_llm/train_mm_llm.py`
+- `scripts/train_mm_llm.sh`
+
+Evaluation:
+
+- `src/models/mm_llm/evaluate_mm_llm.py`
+- `scripts/eval_mm_llm.sh`
+
+### 4.6 Empirical Observations (internal)
+
+- **Multimodal (image + text) > image-only**.
+- Dropping demographics can **maintain or improve** performance and reduce explicit reliance on ethnicity/age/sex.
+- Upgrading from Qwen-2-VL to **Qwen-2.5-VL** improves overall diagnosis accuracy and especially rare-class performance.
+
+---
+
+## 5. Part II – StyleGAN3 Synthesis for Evaluation
+
+> ℹ️ **StyleGAN3 is auxiliary** in this repository.  
+> Its role is to **support evaluation and visualization** of rare disease facial gestalt, not to perform diagnosis itself.
+
+### 5.1 Goal
+
+We use **StyleGAN3** as a **class-conditional face generator** trained on GMDB ten-disease faces. Synthetic images are used to:
+
+- Visualize **disease-specific facial patterns** learned from GMDB.
+- Provide **synthetic exemplars** for:
+  - Teaching materials
+  - Qualitative comparison with GestaltM³D-VL predictions
+- Optionally stress-test robustness (e.g., more varied poses, ages, or subtle changes).
+
+### 5.2 StyleGAN3 Overview (Short)
+
+- Alias-free generation for better geometric consistency.
+- Class-conditional setup across ten disease classes (+ optional unaffected class).
+- Trained on the **same preprocessed 224×224 faces** used by GestaltM³D-VL.
+
+<p align="center">
+  <img src="docs/figures/stylegan3_overview.png" alt="StyleGAN3 training overview" width="800">
+</p>
+
+### 5.3 Training & Sampling
+
+Configuration (see `configs/stylegan3/ten_disease_default.yaml`):
+
+- Dataset: preprocessed GMDB faces.
+- Classes: 10 diseases (+/- unaffected).
+
+Run:
+
+```bash
+bash scripts/train_stylegan3.sh
+bash scripts/sample_stylegan3.sh
+```
+
+This will populate:
+
+```text
+data/processed/stylegan3_samples/
+  disease_0/
+  disease_1/
+  ...
+```
+
+with class-conditional synthetic faces.
+
+### 5.4 Using Synthetic Images
+
+You can use the synthetic images to:
+
+- Build **grids of synthetic faces per disease**.
+- Compare **real patient images & model predictions** with:
+  - Synthetic faces from the predicted disease.
+- Support **case studies** and **clinical teaching** materials.
+
+<p align="center">
+  <img src="docs/figures/stylegan3_synthetic_examples.png" alt="Synthetic samples per disease class generated by StyleGAN3" width="800">
+</p>
 
 ---
 
 ## 6. Repository Structure
 
-Recommended repository layout:
+Diagnosis is the core; StyleGAN3 is auxiliary:
 
 ```text
 .
@@ -289,14 +291,14 @@ Recommended repository layout:
 ├── requirements.txt
 ├── environment.yml
 ├── configs/
-│   ├── stylegan3/
-│   │   └── ten_disease_default.yaml
-│   └── mm_llm/
-│       └── qwen2_5_vl_ten_disease.yaml
+│   ├── mm_llm/
+│   │   └── qwen2_5_vl_ten_disease.yaml
+│   └── stylegan3/
+│       └── ten_disease_default.yaml
 ├── data/
 │   ├── raw/
 │   ├── processed/
-│   │   └── stylegan3_samples/   # synthetic images per class
+│   │   └── stylegan3_samples/
 │   └── splits/
 │       └── ten_disease/
 │           ├── train.csv
@@ -308,9 +310,9 @@ Recommended repository layout:
 │       ├── example_cases.png
 │       ├── dataset_stats.png
 │       ├── preprocessing_pipeline.png
+│       ├── mm_llm_architecture.png
 │       ├── stylegan3_overview.png
 │       ├── stylegan3_synthetic_examples.png
-│       ├── mm_llm_architecture.png
 │       └── method_block_diagram.png
 ├── src/
 │   ├── data/
@@ -318,14 +320,14 @@ Recommended repository layout:
 │   │   ├── preprocess_faces.py
 │   │   └── build_splits.py
 │   ├── models/
-│   │   ├── stylegan3/
-│   │   │   ├── train_stylegan3.py
-│   │   │   └── sample_stylegan3.py
-│   │   └── mm_llm/
-│   │       ├── mm_classifier.py
-│   │       ├── losses.py
-│   │       ├── train_mm_llm.py
-│   │       └── evaluate_mm_llm.py
+│   │   ├── mm_llm/
+│   │   │   ├── mm_classifier.py
+│   │   │   ├── losses.py
+│   │   │   ├── train_mm_llm.py
+│   │   │   └── evaluate_mm_llm.py
+│   │   └── stylegan3/
+│   │       ├── train_stylegan3.py
+│   │       └── sample_stylegan3.py
 │   └── utils/
 │       ├── config.py
 │       ├── logging_utils.py
@@ -333,10 +335,10 @@ Recommended repository layout:
 │       └── seed.py
 └── scripts/
     ├── prepare_gmdb.sh
-    ├── train_stylegan3.sh
-    ├── sample_stylegan3.sh
     ├── train_mm_llm.sh
-    └── eval_mm_llm.sh
+    ├── eval_mm_llm.sh
+    ├── train_stylegan3.sh
+    └── sample_stylegan3.sh
 ```
 
 ---
@@ -364,7 +366,7 @@ pip install -r requirements.txt
 - `transformers`, `accelerate`, `bitsandbytes` (optional)
 - `timm`
 - `opencv-python`, `mediapipe`
-- `gfpgan`, `ddcolor` (or equivalent)
+- `gfpgan`, `ddcolor`
 - `scikit-learn`
 - `pandas`, `numpy`
 - `matplotlib`, `seaborn`
@@ -396,13 +398,13 @@ python -m src.data.build_splits \
   --output_dir data/splits/ten_disease
 ```
 
-This creates:
+Creates:
 
 - `train.csv`
 - `val.csv`
 - `test.csv`
 
-with typical columns:
+with columns such as:
 
 - `image_path`
 - `disease_label`
@@ -424,23 +426,7 @@ Repeat or adapt for val/test splits.
 
 ## 9. Training & Evaluation
 
-### 9.1 StyleGAN3 (Synthesis for Evaluation)
-
-```bash
-# Train StyleGAN3 on GMDB ten-disease faces
-bash scripts/train_stylegan3.sh
-
-# Sample synthetic faces per disease class
-bash scripts/sample_stylegan3.sh
-```
-
-This will populate `data/processed/stylegan3_samples/` with class-conditional synthetic images, which you can use for:
-
-- qualitative inspection,
-- generating figures for papers/presentations,
-- additional robustness experiments.
-
-### 9.2 GestaltM³D-VL (Multimodal Diagnosis)
+### 9.1 GestaltM³D-VL (Main)
 
 ```bash
 # Train GestaltM3D-VL on GMDB ten-disease subset
@@ -450,49 +436,57 @@ bash scripts/train_mm_llm.sh
 bash scripts/eval_mm_llm.sh
 ```
 
-`configs/mm_llm/qwen2_5_vl_ten_disease.yaml` controls:
+Control hyperparameters and backbone in:
 
-- Backbone (Qwen-2-VL / Qwen-2.5-VL / Qwen-3-VL)
-- Learning rate, batch size
-- Modules to freeze / finetune
-- Whether demographics are included in the text prompt
+- `configs/mm_llm/qwen2_5_vl_ten_disease.yaml`
+
+### 9.2 StyleGAN3 (Auxiliary)
+
+```bash
+# Train StyleGAN3 on preprocessed GMDB faces
+bash scripts/train_stylegan3.sh
+
+# Sample synthetic faces per disease class
+bash scripts/sample_stylegan3.sh
+```
+
+Synthetic samples are stored in:
+
+- `data/processed/stylegan3_samples/`
 
 ---
 
 ## 10. Figures to Include
 
-To make the README visually informative on GitHub, we recommend preparing at least:
+To highlight **diagnosis as the core**, we recommend:
 
 1. `overview_pipeline.png`  
-   - Overall flow: GMDB → preprocessing → StyleGAN3 (synthesis) → GestaltM³D-VL (diagnosis).
+   - Emphasize the **diagnosis branch**, show StyleGAN3 as a supporting side branch.
 
-2. `example_cases.png`  
-   - Example patient faces (de-identified or synthetic) and their HPO descriptions.
+2. `mm_llm_architecture.png`  
+   - Detailed architecture of GestaltM³D-VL.
 
-3. `dataset_stats.png`  
-   - Label distribution and summary statistics for the ten-disease subset.
+3. `example_cases.png`  
+   - Real (or synthetic) examples with images + HPO text.
 
-4. `preprocessing_pipeline.png`  
-   - Before/after examples of DDColor + GFPGAN + MediaPipe cropping.
+4. `dataset_stats.png`  
+   - Label distribution and cohort statistics.
 
-5. `stylegan3_overview.png`  
-   - StyleGAN3 training sketch (class-conditional, synthesis examples).
+5. `preprocessing_pipeline.png`  
+   - Before/after facial preprocessing.
 
-6. `stylegan3_synthetic_examples.png`  
-   - A grid of synthetic faces per disease class.
+6. `stylegan3_overview.png`, `stylegan3_synthetic_examples.png`  
+   - Smaller/secondary figures for synthetic images.
 
-7. `mm_llm_architecture.png`  
-   - GestaltM³D-VL architecture diagram: image + HPO text → Qwen-VL → classifier.
-
-8. `method_block_diagram.png`  
-   - High-level schematic showing Part I (synthesis) and Part II (diagnosis).
+7. `method_block_diagram.png`  
+   - High-level schematic with **diagnosis as the main block**.
 
 ---
 
 ## 11. Citation
 
 If you build on this repository, please cite your own work and related foundations.  
-A placeholder BibTeX entry:
+Placeholder BibTeX:
 
 ```bibtex
 @article{your_gestaltm3dvl_paper,
@@ -505,7 +499,7 @@ A placeholder BibTeX entry:
 
 Also consider citing:
 
-- GestaltMatcher / GestaltMML papers
+- GestaltMatcher / GMDB / GestaltMML
 - Qwen2-VL / Qwen2.5-VL / Qwen3-VL technical reports
 - StyleGAN3, DDColor, GFPGAN, MediaPipe
 
@@ -516,8 +510,8 @@ Also consider citing:
 - **License**: To be decided (e.g., MIT / Apache-2.0 / custom research license).  
 - **Data**: This repository does **not** include patient-identifiable GMDB/CHOP data.  
 - **Usage**:
-  - Any use of real patient data must follow appropriate **IRB**, **data-use agreements**, and **local regulations**.
-  - Synthetic images are intended for research and evaluation only.
+  - Any use of real patient data must follow **IRB**, **data-use agreements**, and **local regulations**.
+  - Synthetic images are intended for **research** and **evaluation** only.
 
 > This repository is for **research** and **method development** only.  
 > It is **not** a certified medical device and should not be used directly for clinical decision-making without thorough validation and regulatory approval.
