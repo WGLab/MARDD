@@ -9,13 +9,13 @@
 ### Overall pipeline (Diagnosis-centric)
 
 <p align="center">
-  <img src="docs/figures/overview_pipeline.png" alt="Overall diagnosis-centric pipeline of GestaltM3D-VL" width="800">
+  <img src="docs/figures/pipeline.png" alt="Overall diagnosis-centric pipeline of GestaltM3D-VL" width="800">
 </p>
 
 ### Example faces & HPO text
 
 <p align="center">
-  <img src="docs/figures/example_cases.png" alt="Example GMDB cases with facial images and HPO descriptions" width="800">
+  <img src="docs/figures/example.png" alt="Example GMDB cases with facial images and HPO descriptions" width="800">
 </p>
 
 ---
