@@ -5,11 +5,6 @@
 
 ---
 
-## Teaser & Key Figures
-
-> 💡 本 README 假设你会在 `docs/figures/` 下放置对应图片文件。  
-> 下面是推荐的图文件名与 README 中的引用方式，你可以用 PPT 导出或重新画图后，保存为相同路径即可，GitHub 会自动渲染。
-
 ### Overall pipeline
 
 <p align="center">
