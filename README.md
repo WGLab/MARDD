@@ -478,7 +478,7 @@ Also consider citing:
 
 ## License & Disclaimer
 
-- **License**: To be decided (e.g., MIT / Apache-2.0 / custom research license).  
+- **License**: MIT LICENSE.  
 - **Data**: This repository does **not** include patient-identifiable GMDB/CHOP data.  
 - **Usage**:
   - Any use of real patient data must follow **IRB**, **data-use agreements**, and **local regulations**.
