@@ -53,12 +53,6 @@ This repository implements a **disease-diagnosis–centric** pipeline on the **G
    - Generate **synthetic facial images**:
      - For **qualitative evaluation** of disease-specific gestalt.
      - For **visual case studies** comparing predicted diseases and synthetic exemplars.
-   - StyleGAN3 is **auxiliary**; the **primary focus** is the diagnosis model.
-
-<p align="center">
-  <img src="docs/figures/method_block_diagram.png" alt="High-level block diagram of the diagnosis-centric method" width="800">
-</p>
-
 ---
 
 ## 2. Dataset: GMDB Ten-Disease Subset
