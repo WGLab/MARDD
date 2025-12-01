@@ -282,6 +282,10 @@ We provide an interactive web-based gallery to explore the synthetic facial imag
 
 **[🌐 Phenotype-Disease Synthetic Image Database](https://hongzhuochen.github.io/Phenotype-Disease-Image-Database-demo/)**
 
+<p align="center">
+  <img src="docs/figures/web_gallery_screenshot.png" alt="Interactive web gallery showing StyleGAN3 synthetic faces" width="800">
+</p>
+
 This gallery features:
 - **StyleGAN3-generated synthetic faces** for all ten disease classes
 - **Interactive filtering** by disease type, age, gender, and ethnicity
