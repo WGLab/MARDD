@@ -485,16 +485,8 @@ To highlight **diagnosis as the core**, we recommend:
 
 ## 11. Citation
 
-If you build on this repository, please cite your own work and related foundations.  
-Placeholder BibTeX:
-
 ```bibtex
-@article{your_gestaltm3dvl_paper,
-  title   = {GestaltM3D-VL: Multimodal Vision--Language Diagnosis of Mendelian Rare Diseases},
-  author  = {Your Name and Collaborators},
-  journal = {To appear},
-  year    = {2025}
-}
+placeholder
 ```
 
 Also consider citing:
