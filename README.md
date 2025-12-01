@@ -456,34 +456,9 @@ Synthetic samples are stored in:
 
 ---
 
-## 10. Figures to Include
 
-To highlight **diagnosis as the core**, we recommend:
 
-1. `overview_pipeline.png`  
-   - Emphasize the **diagnosis branch**, show StyleGAN3 as a supporting side branch.
-
-2. `mm_llm_architecture.png`  
-   - Detailed architecture of GestaltM³D-VL.
-
-3. `example_cases.png`  
-   - Real (or synthetic) examples with images + HPO text.
-
-4. `dataset_stats.png`  
-   - Label distribution and cohort statistics.
-
-5. `preprocessing_pipeline.png`  
-   - Before/after facial preprocessing.
-
-6. `stylegan3_overview.png`, `stylegan3_synthetic_examples.png`  
-   - Smaller/secondary figures for synthetic images.
-
-7. `method_block_diagram.png`  
-   - High-level schematic with **diagnosis as the main block**.
-
----
-
-## 11. Citation
+## Citation
 
 ```bibtex
 placeholder
@@ -497,7 +472,7 @@ Also consider citing:
 
 ---
 
-## 12. License & Disclaimer
+## License & Disclaimer
 
 - **License**: To be decided (e.g., MIT / Apache-2.0 / custom research license).  
 - **Data**: This repository does **not** include patient-identifiable GMDB/CHOP data.  
