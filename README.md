@@ -1,6 +1,6 @@
-# GestaltM$^2$D-VL: Multimodal Vision–Language Diagnosis of Mendelian Rare Diseases
+# GestaltM<sup>2</sup>D-VL: **M**ultimodal Vision–Language Diagnosis of **M**endelian Rare Diseases
 
-> **GestaltM³D-VL** (Gestalt Multimodal Model for Mendelian Disease Diagnosis with Vision–Language Integration)  
+> **GestaltM<sup>2</sup>D-VL** (Gestalt Multimodal Model for Mendelian Disease Diagnosis with Vision–Language Integration)  
 > A **diagnosis-first** multimodal model that leverages **facial images** and **HPO-encoded clinical text** for **Mendelian rare disease diagnosis**.  
 > Additionally, we train **StyleGAN3** on GMDB faces to generate **synthetic facial images** used for **qualitative evaluation and analysis**.
 
