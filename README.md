@@ -15,7 +15,7 @@
 ### Example faces & HPO text
 
 <p align="center">
-  <img src="docs/figures/example.png" alt="Example GMDB cases with facial images and HPO descriptions" width="800">
+  <img src="docs/figures/examples.png" alt="Example GMDB cases with facial images and HPO descriptions" width="800">
 </p>
 
 ---
@@ -83,7 +83,7 @@ Key stats for the **ten-disease subset**:
 > You must obtain data access following your **institutional, IRB, and data-use agreements**, then place the files under `data/raw/`.
 
 <p align="center">
-  <img src="docs/figures/dataset_stats.png" alt="Label distribution and cohort statistics for the GMDB ten-disease subset" width="800">
+  <img src="docs/figures/data_distribution.png" alt="Label distribution and cohort statistics for the GMDB ten-disease subset" width="800">
 </p>
 
 ---
@@ -112,7 +112,7 @@ We build a **three-stage preprocessing pipeline** shared by both the diagnosis m
 The script `src/data/preprocess_faces.py` orchestrates DDColor, GFPGAN, and MediaPipe and writes processed images into `data/processed/images`.
 
 <p align="center">
-  <img src="docs/figures/preprocessing_pipeline.png" alt="DDColor + GFPGAN + MediaPipe facial preprocessing pipeline" width="800">
+  <img src="docs/figures/data_preprocess.png" alt="DDColor + GFPGAN + MediaPipe facial preprocessing pipeline" width="800">
 </p>
 
 ---
