@@ -1,4 +1,4 @@
-# GestaltM³D-VL: Multimodal Vision–Language Diagnosis of Mendelian Rare Diseases
+# GestaltM$^2$D-VL: Multimodal Vision–Language Diagnosis of Mendelian Rare Diseases
 
 > **GestaltM³D-VL** (Gestalt Multimodal Model for Mendelian Disease Diagnosis with Vision–Language Integration)  
 > A **diagnosis-first** multimodal model that leverages **facial images** and **HPO-encoded clinical text** for **Mendelian rare disease diagnosis**.  
