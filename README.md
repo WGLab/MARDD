@@ -440,7 +440,7 @@ Control hyperparameters and backbone in:
 
 - `configs/mm_llm/qwen2_5_vl_ten_disease.yaml`
 
-### 9.2 StyleGAN3 (Auxiliary)
+### 9.2 StyleGAN3
 
 ```bash
 # Train StyleGAN3 on preprocessed GMDB faces
