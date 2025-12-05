@@ -1,6 +1,6 @@
-# GestaltM<sup>2</sup>D-VL: Gestalt Multimodal Model for Mendelian Disease Diagnosis with Vision–Language Integration
+# MARDD: Multimodal AI for Rare Disease Diagnosis with Vision–Language Integration
 
-> **GestaltM<sup>2</sup>D-VL** (Gestalt Multimodal Model for Mendelian Disease Diagnosis with Vision–Language Integration)  
+> **MARDD** (Gestalt Multimodal Model for Mendelian Disease Diagnosis with Vision–Language Integration)  
 > A **diagnosis-first** multimodal model that leverages **facial images** and **HPO-encoded clinical text** for **Mendelian rare disease diagnosis**.  
 > Additionally, we train **StyleGAN3** on GMDB faces to generate **synthetic facial images** used for **qualitative evaluation and analysis**.
 
