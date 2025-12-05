@@ -2,7 +2,7 @@
 
 > **MARDD** (Gestalt Multimodal Model for Mendelian Disease Diagnosis with Vision–Language Integration)  
 > A **diagnosis-first** multimodal model that leverages **facial images** and **HPO-encoded clinical text** for **Mendelian rare disease diagnosis**.  
-> Additionally, we train **StyleGAN3** on GMDB faces to generate **synthetic facial images** used for **qualitative evaluation and analysis**.
+> Additionally, we use **synthetic facial images** (the PDIDB code is available [here](https://github.com/WGLab/PDIDB)) for **qualitative evaluation and analysis** and for **oversampling rare classes**.
 
 ---
 
