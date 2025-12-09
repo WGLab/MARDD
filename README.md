@@ -296,79 +296,16 @@ This gallery features:
 
 ---
 
-## 6. Repository Structure
+## 6. Installation
 
-Diagnosis is the core; StyleGAN3 is auxiliary:
-
-```text
-.
-├── README.md
-├── LICENSE
-├── requirements.txt
-├── environment.yml
-├── configs/
-│   ├── mm_llm/
-│   │   └── qwen2_5_vl_ten_disease.yaml
-│   └── stylegan3/
-│       └── ten_disease_default.yaml
-├── data/
-│   ├── raw/
-│   ├── processed/
-│   │   └── stylegan3_samples/
-│   └── splits/
-│       └── ten_disease/
-│           ├── train.csv
-│           ├── val.csv
-│           └── test.csv
-├── docs/
-│   └── figures/
-│       ├── overview_pipeline.png
-│       ├── example_cases.png
-│       ├── dataset_stats.png
-│       ├── preprocessing_pipeline.png
-│       ├── mm_llm_architecture.png
-│       ├── stylegan3_overview.png
-│       ├── stylegan3_synthetic_examples.png
-│       └── method_block_diagram.png
-├── src/
-│   ├── data/
-│   │   ├── gmdb_dataset.py
-│   │   ├── preprocess_faces.py
-│   │   └── build_splits.py
-│   ├── models/
-│   │   ├── mm_llm/
-│   │   │   ├── mm_classifier.py
-│   │   │   ├── losses.py
-│   │   │   ├── train_mm_llm.py
-│   │   │   └── evaluate_mm_llm.py
-│   │   └── stylegan3/
-│   │       ├── train_stylegan3.py
-│   │       └── sample_stylegan3.py
-│   └── utils/
-│       ├── config.py
-│       ├── logging_utils.py
-│       ├── metrics.py
-│       └── seed.py
-└── scripts/
-    ├── prepare_gmdb.sh
-    ├── train_mm_llm.sh
-    ├── eval_mm_llm.sh
-    ├── train_stylegan3.sh
-    └── sample_stylegan3.sh
-```
-
----
-
-## 7. Installation
-
-### 7.1 Conda environment
+### 6.1 Conda environment
 
 ```bash
 conda env create -f environment.yml
 conda activate gestaltm3d-vl
 ```
 
-### 7.2 Pip
+### 6.2 Pip
 
 ```bash
 python -m venv .venv
@@ -390,9 +327,9 @@ pip install -r requirements.txt
 
 ---
 
-## 8. Data Preparation
+## 7. Data Preparation
 
-### 8.1 Place raw data
+### 7.1 Place raw data
 
 Place GMDB (and optional CHOP) metadata and images under:
 
@@ -406,7 +343,7 @@ data/raw/
 > The exact file naming depends on your internal export.  
 > Adjust in `src/data/build_splits.py` and `src/data/preprocess_faces.py` accordingly.
 
-### 8.2 Build patient-level splits
+### 7.2 Build patient-level splits
 
 ```bash
 python -m src.data.build_splits \
@@ -427,7 +364,7 @@ with columns such as:
 - `hpo_text`
 - `demographics` (optional)
 
-### 8.3 Run facial preprocessing
+### 7.3 Run facial preprocessing
 
 ```bash
 python -m src.data.preprocess_faces \
@@ -440,9 +377,9 @@ Repeat or adapt for val/test splits.
 
 ---
 
-## 9. Training & Evaluation
+## 8. Training & Evaluation
 
-### 9.1 GestaltM³D-VL (Main)
+### 8.1 MARDD (Main)
 
 ```bash
 # Train GestaltM3D-VL on GMDB ten-disease subset
@@ -455,23 +392,6 @@ bash scripts/eval_mm_llm.sh
 Control hyperparameters and backbone in:
 
 - `configs/mm_llm/qwen2_5_vl_ten_disease.yaml`
-
-### 9.2 StyleGAN3
-
-```bash
-# Train StyleGAN3 on preprocessed GMDB faces
-bash scripts/train_stylegan3.sh
-
-# Sample synthetic faces per disease class
-bash scripts/sample_stylegan3.sh
-```
-
-Synthetic samples are stored in:
-
-- `data/processed/stylegan3_samples/`
-
----
-
 
 
 ## Citation
